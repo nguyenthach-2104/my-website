@@ -1,17 +1,20 @@
-if (!localStorage.getItem('loggedIn')) {
-    window.location.href = 'login.html';
-}
+// Kiểm tra mật khẩu
+document.getElementById('password-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    const correctPassword = 'admin123'; // Mật khẩu cứng, bạn có thể thay đổi
 
+    if (password === correctPassword) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'block';
+    } else {
+        alert('Mật khẩu sai! Vui lòng thử lại.');
+    }
+});
+
+// Hàm đăng xuất
 function logout() {
-    localStorage.removeItem('loggedIn');
-    window.location.href = 'login.html';
+    document.getElementById('dashboard-section').style.display = 'none';
+    document.getElementById('login-section').style.display = 'block';
+    document.getElementById('password').value = ''; // Xóa mật khẩu đã nhập
 }
-
-// Kết nối Google Sheets qua Google Apps Script
-fetch('YOUR_GOOGLE_APPS_SCRIPT_URL')
-    .then(response => response.json())
-    .then(data => {
-        // Xử lý dữ liệu từ Google Sheets
-        console.log(data);
-        drawChart(data); // Vẽ biểu đồ
-    });
