@@ -1,0 +1,41 @@
+@media (max-width: 768px) {
+    /* Điều chỉnh header và nav */
+    nav {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    /* Điều chỉnh sản phẩm */
+    .product {
+        padding: 0.5rem;
+    }
+
+    .product h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Điều chỉnh blog */
+    article {
+        padding: 0.5rem;
+    }
+
+    article h2 {
+        font-size: 1.25rem;
+    }
+
+    /* Điều chỉnh form */
+    form {
+        width: 90%;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    main {
+        padding: 1rem;
+    }
+}
