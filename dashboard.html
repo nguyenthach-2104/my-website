@@ -7,93 +7,485 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <style>
-        body { padding: 20px; }
-        .filter-bar { margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .toggle-row { cursor: pointer; font-weight: bold; }
-        .detail-row { display: none; }
-        .total-row { font-weight: bold; background-color: #e9ecef; }
-    </style>
+    <!-- Tải Chart.js trước -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Tải plugin datalabels sau -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <!-- Đăng ký plugin -->
+    <script>
+        // Đăng ký plugin ChartDataLabels
+        if (typeof Chart !== 'undefined' && typeof ChartDataLabels !== 'undefined') {
+            Chart.register(ChartDataLabels);
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        /* Reset và thiết lập cơ bản */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #606060;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            /* Gradient lặp lại khi cuộn */
+            background: linear-gradient(135deg, #edb32e, #fdcdc9) 0% 100vh,
+                        linear-gradient(135deg, #fdcdc9, #edb32e) 100vh 200vh,
+                        linear-gradient(135deg, #edb32e, #fdcdc9) 200vh 300vh,
+                        linear-gradient(135deg, #fdcdc9, #edb32e) 300vh 400vh;
+            background-size: 100% 100vh;
+            background-attachment: fixed;
+        }
+
+        /* Backdrop (khung nền) */
+        .backdrop {
+            background: rgba(255, 255, 255, 0.3); /* Opacity 30% */
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Container chính */
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px; /* Giới hạn chiều rộng tối đa */
+            min-height: 100vh;
+        }
+
+        /* Cột điều hướng bên trái */
+        .sidebar {
+            width: 160px; /* Điều chỉnh chiều rộng để vừa với chữ dài nhất + padding */
+            position: fixed;
+            top: 20px;
+            bottom: 20px;
+            left: calc((100% - 1400px) / 2 + 20px); /* Căn giữa dựa trên max-width của container */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4)); /* Tăng opacity */
+            border-radius: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: #606060;
+            text-decoration: none;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a.active {
+            background-color: #faeccf;
+            color: #db8f21;
+            font-weight: bold;
+        }
+
+        .sidebar a:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Nội dung chính (giữa) */
+        .main-content {
+            flex: 2;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+            border-radius: 20px;
+            margin: 20px;
+            margin-left: 180px; /* Cách sidebar 20px (160px + 20px) */
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Khu vực biểu đồ (bên phải) */
+        .chart-area {
+            flex: 1;
+            padding: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+            border-radius: 20px;
+            margin: 20px;
+            margin-left: 0;
+            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Thanh công cụ (Filter Bar) */
+        .filter-bar {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-bar label {
+            font-weight: 500;
+            color: #606060;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            border-color: #db8f21;
+            outline: none;
+        }
+
+        .filter-bar button {
+            background-color: #db8f21;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filter-bar button:hover {
+            background-color: #b3741a;
+        }
+
+        /* Tiêu đề */
+        h1, h2, h3, h4 {
+            background: none; /* Loại bỏ màu nền */
+            color: #606060; /* Màu xám */
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin: 30px 0 15px;
+        }
+
+        h3 {
+            font-size: 18px;
+            margin: 20px 0 10px;
+        }
+
+        h4 {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        /* Bảng */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: #db8f21;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+            color: #606060;
+        }
+
+        tr:hover:not(.total-row):not(.toggle-row) {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .total-row {
+            background-color: #faeccf;
+            font-weight: bold;
+            color: #606060;
+        }
+
+        .toggle-row {
+            cursor: pointer;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .toggle-row:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        .detail-row {
+            display: none;
+        }
+
+        .sub-table {
+            width: 100%;
+            margin: 10px 0;
+            background-color: transparent;
+        }
+
+        .sub-table th {
+            background-color: #eab42d;
+            color: white;
+        }
+
+        .sub-table td {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Biểu đồ */
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            min-width: 300px;
+            max-width: 100%; /* Đảm bảo biểu đồ không vượt quá khu vực */
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+        }
+
+        canvas {
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px;
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .sidebar a {
+                flex: 1;
+                text-align: center;
+                margin: 5px;
+            }
+
+            .main-content {
+                margin: 10px;
+                padding: 10px;
+                margin-left: 10px;
+            }
+
+            .chart-area {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-bar input,
+            .filter-bar select,
+            .filter-bar button {
+                width: 100%;
+            }
+
+            .chart-wrapper {
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            h3 {
+                font-size: 16px;
+            }
+
+            h4 {
+                font-size: 14px;
+            }
+
+            th, td {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            canvas {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                padding: 8px;
+            }
+
+            .filter-bar {
+                padding: 10px;
+            }
+
+            .sidebar a {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Báo cáo khách hàng</h1>
+    <div class="backdrop">
+        <div class="container">
+            <!-- Cột điều hướng bên trái -->
+            <div class="sidebar">
+                <a href="#" class="active">Báo cáo KH</a>
+                <a href="#">Trang chủ</a>
+                <a href="#">Sự kiện</a>
+                <a href="#">Tài liệu</a>
+                <a href="#">Kho xe</a>
+            </div>
 
-    <!-- Thanh công cụ -->
-    <div class="filter-bar">
-        <label for="startDate">Ngày bắt đầu:</label>
-        <input type="text" id="startDate" placeholder="dd/mm/yyyy">
-        <label for="endDate">Ngày kết thúc:</label>
-        <input type="text" id="endDate" placeholder="dd/mm/yyyy">
-        <label for="teamSelect">Phòng:</label>
-        <select id="teamSelect"></select>
-        <button onclick="filterData()">Lọc dữ liệu</button>
+            <!-- Nội dung chính (giữa) -->
+            <div class="main-content">
+                <h1>Báo cáo khách hàng</h1>
+
+                <!-- Thanh công cụ -->
+                <div class="filter-bar">
+                    <label for="startDate">Ngày bắt đầu:</label>
+                    <input type="text" id="startDate" placeholder="dd/mm/yyyy">
+                    <label for="endDate">Ngày kết thúc:</label>
+                    <input type="text" id="endDate" placeholder="dd/mm/yyyy">
+                    <label for="teamSelect">Phòng:</label>
+                    <select id="teamSelect"></select>
+                    <button onclick="filterData()">Lọc dữ liệu</button>
+                </div>
+
+                <!-- Section I: Tổng chỉ số -->
+                <h2>I. Tổng chỉ số</h2>
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>TÊN NV</th>
+                            <th>KH TIỀM NĂNG</th>
+                            <th>KÝ MỚI</th>
+                            <th>XHĐ</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <!-- Section II: Thống kê khách hàng theo khu vực -->
+                <h2>II. Thống kê khách hàng theo khu vực</h2>
+                <table id="regionTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>TỈNH</th>
+                            <th>KH TIỀM NĂNG</th>
+                            <th>KÝ</th>
+                            <th>XUẤT</th>
+                            <th>TỈ LỆ KÝ MỚI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <!-- Section III: Thống kê theo loại xe -->
+                <h2>III. Thống kê theo loại xe</h2>
+                <table id="vehicleTypeTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>LOẠI XE</th>
+                            <th>KH TIỀM NĂNG</th>
+                            <th>KÝ</th>
+                            <th>XUẤT</th>
+                            <th>TỈ LỆ KÝ MỚI</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- Khu vực biểu đồ (bên phải) -->
+            <div class="chart-area">
+                <!-- Section I: Để trống -->
+                <div style="height: 300px;"></div> <!-- Khoảng trống cho Section I -->
+
+                <!-- Section II: Biểu đồ tỉ trọng giữa các khu vực -->
+                <h3>Tỉ trọng giữa các khu vực</h3>
+                <div class="chart-wrapper">
+                    <canvas id="regionChart" width="400" height="200"></canvas>
+                </div>
+
+                <!-- Section III: Container chứa 2 biểu đồ -->
+                <h3>Tỉ trọng KÝ HĐ và XHĐ giữa các loại xe</h3>
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <h4>Tỉ trọng KÝ HĐ</h4>
+                        <canvas id="vehicleTypeChartSigned" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-wrapper">
+                        <h4>Tỉ trọng XHĐ</h4>
+                        <canvas id="vehicleTypeChartXhd" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Section I: Tổng chỉ số -->
-    <h2>I. Tổng chỉ số</h2>
-    <table id="summaryTable">
-        <thead>
-            <tr>
-                <th>STT</th>
-                <th>TÊN NV</th>
-                <th>KH TIỀM NĂNG</th>
-                <th>KÝ MỚI</th>
-                <th>XHĐ</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- Section II: Thống kê khách hàng theo khu vực -->
-    <h2>II. Thống kê khách hàng theo khu vực</h2>
-    <table id="regionTable">
-        <thead>
-            <tr>
-                <th>STT</th>
-                <th>TỈNH</th>
-                <th>KH TIỀM NĂNG</th>
-                <th>KÝ</th>
-                <th>XUẤT</th>
-                <th>TỈ LỆ KÝ MỚI</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- Biểu đồ tỉ trọng giữa các khu vực -->
-    <h3>Tỉ trọng KH TIỀM NĂNG giữa các khu vực</h3>
-    <canvas id="regionChart" width="400" height="200"></canvas>
-
-    <!-- Section III: Thống kê theo loại xe -->
-    <h2>III. Thống kê theo loại xe</h2>
-    <table id="vehicleTypeTable">
-        <thead>
-            <tr>
-                <th>STT</th>
-                <th>LOẠI XE</th>
-                <th>KH TIỀM NĂNG</th>
-                <th>KÝ</th>
-                <th>XUẤT</th>
-                <th>TỈ LỆ KÝ MỚI</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- Biểu đồ tỉ trọng KÝ HĐ -->
-    <h3>Tỉ trọng KÝ HĐ giữa các loại xe</h3>
-    <canvas id="vehicleTypeChartSigned" width="400" height="200"></canvas>
-
-    <!-- Biểu đồ tỉ trọng XHĐ -->
-    <h3>Tỉ trọng XHĐ giữa các loại xe</h3>
-    <canvas id="vehicleTypeChartXhd" width="400" height="200"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>

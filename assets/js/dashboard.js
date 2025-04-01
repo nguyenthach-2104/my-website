@@ -421,8 +421,7 @@ function updateRegionTable(data, start, end) {
                     }
                 }
             }
-        },
-        plugins: [ChartDataLabels]
+        }
     });
 }
 
@@ -574,7 +573,6 @@ function updateVehicleTypeTable(data, start, end) {
         </tr>
     `;
 
-    // Vẽ biểu đồ tỉ trọng KÝ HĐ
     const ctxSigned = document.getElementById('vehicleTypeChartSigned').getContext('2d');
     if (window.vehicleTypeChartSigned && typeof window.vehicleTypeChartSigned.destroy === 'function') {
         window.vehicleTypeChartSigned.destroy();
@@ -625,11 +623,9 @@ function updateVehicleTypeTable(data, start, end) {
                     }
                 }
             }
-        },
-        plugins: [ChartDataLabels]
+        }
     });
 
-    // Vẽ biểu đồ tỉ trọng XHĐ
     const ctxXhd = document.getElementById('vehicleTypeChartXhd').getContext('2d');
     if (window.vehicleTypeChartXhd && typeof window.vehicleTypeChartXhd.destroy === 'function') {
         window.vehicleTypeChartXhd.destroy();
@@ -680,8 +676,7 @@ function updateVehicleTypeTable(data, start, end) {
                     }
                 }
             }
-        },
-        plugins: [ChartDataLabels]
+        }
     });
 }
 
