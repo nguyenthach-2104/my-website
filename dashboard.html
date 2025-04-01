@@ -34,7 +34,7 @@
             min-height: 100vh;
             padding: 0;
             margin: 0;
-            /* Gradient lặp lại khi cuộn */
+            /* Gradient lặp lại khi cuộn (trên laptop) */
             background: linear-gradient(135deg, #edb32e, #fdcdc9) 0% 100vh,
                         linear-gradient(135deg, #fdcdc9, #edb32e) 100vh 200vh,
                         linear-gradient(135deg, #edb32e, #fdcdc9) 200vh 300vh,
@@ -62,7 +62,7 @@
 
         /* Cột điều hướng bên trái */
         .sidebar {
-            width: 160px; /* Điều chỉnh chiều rộng để vừa với chữ dài nhất + padding */
+            width: 200px; /* Chứa cả icon và chữ */
             position: fixed;
             top: 20px;
             bottom: 20px;
@@ -71,7 +71,7 @@
             flex-direction: column;
             gap: 10px;
             padding: 20px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4)); /* Tăng opacity */
+            background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 1)); /* Opacity 100% */
             border-radius: 20px;
             z-index: 1000;
             overflow-y: auto;
@@ -79,13 +79,23 @@
         }
 
         .sidebar a {
-            display: block;
-            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            padding: 12px;
             color: #606060;
             text-decoration: none;
             font-size: 16px;
             border-radius: 8px;
             transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .sidebar a .text {
+            display: inline; /* Hiển thị chữ trên laptop */
         }
 
         .sidebar a.active {
@@ -105,7 +115,7 @@
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
             border-radius: 20px;
             margin: 20px;
-            margin-left: 180px; /* Cách sidebar 20px (160px + 20px) */
+            margin-left: 220px; /* Cách sidebar 20px (200px + 20px) */
             box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.5);
         }
 
@@ -113,11 +123,10 @@
         .chart-area {
             flex: 1;
             padding: 20px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+            background: none; /* Không có nền */
             border-radius: 20px;
             margin: 20px;
             margin-left: 0;
-            box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.1), -10px -10px 20px rgba(255, 255, 255, 0.5);
         }
 
         /* Thanh công cụ (Filter Bar) */
@@ -128,7 +137,7 @@
             margin-bottom: 30px;
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px; /* Khoảng cách giữa các phần tử */
             align-items: center;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
         }
@@ -145,6 +154,7 @@
             border-radius: 5px;
             font-size: 14px;
             transition: border-color 0.3s;
+            max-width: 120px; /* Thu nhỏ chiều rộng ô nhập ngày tháng trên laptop */
         }
 
         .filter-bar input:focus,
@@ -278,7 +288,7 @@
             flex: 1;
             min-width: 300px;
             max-width: 100%; /* Đảm bảo biểu đồ không vượt quá khu vực */
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5)); /* Nền trên laptop */
             border-radius: 8px;
             padding: 10px;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
@@ -292,51 +302,69 @@
 
         /* Responsive */
         @media (max-width: 1024px) {
+            body {
+                /* Gradient cố định trên mobile, không lặp lại */
+                background: linear-gradient(135deg, #edb32e, #fdcdc9);
+                background-size: cover; /* Phủ toàn bộ màn hình, không lặp lại */
+                background-attachment: fixed; /* Nền cố định khi cuộn */
+                background-repeat: no-repeat; /* Đảm bảo không lặp lại */
+            }
+
             .container {
                 flex-direction: column;
+                padding-bottom: 60px; /* Đảm bảo không bị che bởi sidebar */
             }
 
             .sidebar {
-                position: static;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                left: 0;
+                right: 0;
                 width: 100%;
                 flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
+                justify-content: space-around;
                 padding: 10px;
                 margin: 0;
-                border-radius: 0;
+                border-radius: 20px 20px 0 0; /* Bo tròn ở trên, không bo ở dưới */
             }
 
             .sidebar a {
-                flex: 1;
-                text-align: center;
-                margin: 5px;
+                padding: 10px;
+                font-size: 24px; /* Kích thước icon lớn hơn trên mobile */
+            }
+
+            .sidebar a .text {
+                display: none; /* Ẩn chữ trên mobile */
             }
 
             .main-content {
-                margin: 10px;
-                padding: 10px;
-                margin-left: 10px;
+                margin: 5px; /* Giảm margin để tăng chiều rộng nội dung */
+                padding: 5px; /* Giảm padding để tăng chiều rộng nội dung */
+                margin-left: 5px;
             }
 
             .chart-area {
-                margin: 10px;
-                padding: 10px;
+                margin: 5px; /* Giảm margin để tăng chiều rộng nội dung */
+                padding: 5px; /* Giảm padding để tăng chiều rộng nội dung */
+            }
+
+            .chart-wrapper {
+                background: none; /* Loại bỏ nền trên mobile */
+                box-shadow: none; /* Loại bỏ bóng để không có lằn */
             }
 
             .filter-bar {
                 flex-direction: column;
                 align-items: flex-start;
+                padding: 10px; /* Giảm padding để tăng chiều rộng nội dung */
             }
 
             .filter-bar input,
             .filter-bar select,
             .filter-bar button {
-                width: 100%;
-            }
-
-            .chart-wrapper {
-                max-width: 100%;
+                width: 100%; /* Giữ nguyên trên mobile */
+                max-width: none; /* Bỏ giới hạn chiều rộng trên mobile */
             }
 
             h1 {
@@ -357,7 +385,7 @@
 
             th, td {
                 font-size: 12px;
-                padding: 10px;
+                padding: 8px; /* Giảm padding để nội dung bảng rộng hơn */
             }
 
             table {
@@ -371,15 +399,15 @@
 
         @media (max-width: 480px) {
             th, td {
-                padding: 8px;
+                padding: 6px; /* Giảm thêm padding trên màn hình nhỏ hơn */
             }
 
             .filter-bar {
-                padding: 10px;
+                padding: 8px; /* Giảm padding trên màn hình nhỏ hơn */
             }
 
             .sidebar a {
-                font-size: 14px;
+                font-size: 20px; /* Kích thước icon nhỏ hơn trên màn hình rất nhỏ */
                 padding: 8px;
             }
         }
@@ -390,11 +418,26 @@
         <div class="container">
             <!-- Cột điều hướng bên trái -->
             <div class="sidebar">
-                <a href="#" class="active">Báo cáo KH</a>
-                <a href="#">Trang chủ</a>
-                <a href="#">Sự kiện</a>
-                <a href="#">Tài liệu</a>
-                <a href="#">Kho xe</a>
+                <a href="#" class="active" title="Báo cáo KH">
+                    <span class="icon">📊</span>
+                    <span class="text">Báo cáo KH</span>
+                </a>
+                <a href="#" title="Trang chủ">
+                    <span class="icon">🏠</span>
+                    <span class="text">Trang chủ</span>
+                </a>
+                <a href="#" title="Sự kiện">
+                    <span class="icon">📅</span>
+                    <span class="text">Sự kiện</span>
+                </a>
+                <a href="#" title="Tài liệu">
+                    <span class="icon">📄</span>
+                    <span class="text">Tài liệu</span>
+                </a>
+                <a href="#" title="Kho xe">
+                    <span class="icon">🚗</span>
+                    <span class="text">Kho xe</span>
+                </a>
             </div>
 
             <!-- Nội dung chính (giữa) -->
