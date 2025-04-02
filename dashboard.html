@@ -209,8 +209,8 @@
             margin: 10px 0;
         }
 
-        /* Bảng */
-        table {
+        /* Định dạng chung cho các bảng */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             background: rgba(255, 255, 255, 0.6); /* Màu trắng, opacity 60% */
@@ -220,62 +220,85 @@
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
         }
 
-        th, td {
+        .data-table th,
+        .data-table td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid rgba(96, 96, 96, 0.2); /* Border xám nhạt */
         }
 
-        th {
+        .data-table th {
             background: none; /* Loại bỏ màu nền */
             color: #606060; /* Màu xám */
             font-weight: bold; /* In đậm */
             text-transform: uppercase;
             font-size: 14px;
+            cursor: pointer; /* Con trỏ chuột để người dùng biết có thể bấm */
         }
 
-        td {
+        .data-table th:hover {
+            background: rgba(255, 255, 255, 0.8); /* Hiệu ứng hover nhẹ */
+        }
+
+        .data-table th.no-sort {
+            cursor: default; /* Không hiển thị con trỏ chuột cho cột STT */
+        }
+
+        .data-table th.no-sort:hover {
+            background: none; /* Không có hiệu ứng hover cho cột STT */
+        }
+
+        .data-table th:active {
+            background: rgba(255, 255, 255, 0.9); /* Hiệu ứng khi bấm (cho mobile) */
+        }
+
+        .data-table td {
             font-size: 14px;
             color: #606060;
         }
 
-        tr:hover:not(.total-row):not(.toggle-row) {
+        .data-table tr:hover:not(.total-row):not(.toggle-row) {
             background-color: rgba(255, 255, 255, 0.8); /* Hiệu ứng hover nhẹ */
         }
 
-        .total-row {
+        .data-table .total-row {
             background: none; /* Loại bỏ màu nền */
             font-weight: bold;
             color: #606060;
         }
 
-        .toggle-row {
+        .data-table .toggle-row {
             cursor: pointer;
             font-weight: 500;
             background: none; /* Trong suốt */
         }
 
-        .toggle-row:hover {
+        .data-table .toggle-row:hover {
             background-color: rgba(255, 255, 255, 0.8);
         }
 
-        .detail-row {
+        .data-table .detail-row {
             display: none;
         }
 
-        .sub-table {
+        .data-table .sub-table {
             width: 100%;
             margin: 10px 0;
             background: none; /* Trong suốt */
         }
 
-        .sub-table th {
+        .data-table .sub-table th {
             background: none; /* Loại bỏ màu nền */
             color: #606060; /* Màu xám */
             font-weight: bold;
+            cursor: pointer; /* Con trỏ chuột cho sub-table */
         }
 
-        .sub-table td {
+        .data-table .sub-table th:hover {
+            background: rgba(255, 255, 255, 0.8); /* Hiệu ứng hover nhẹ */
+        }
+
+        .data-table .sub-table td {
             background: none; /* Trong suốt */
         }
 
@@ -388,13 +411,18 @@
                 font-size: 14px;
             }
 
-            th, td {
+            .data-table th,
+            .data-table td {
                 font-size: 12px;
                 padding: 8px; /* Giảm padding để nội dung bảng rộng hơn */
             }
 
-            table {
+            .data-table {
                 font-size: 12px;
+            }
+
+            .data-table th:hover {
+                background: none; /* Loại bỏ hiệu ứng hover trên mobile */
             }
 
             canvas {
@@ -403,7 +431,8 @@
         }
 
         @media (max-width: 480px) {
-            th, td {
+            .data-table th,
+            .data-table td {
                 padding: 6px; /* Giảm thêm padding trên màn hình nhỏ hơn */
             }
 
@@ -461,53 +490,53 @@
                 </div>
 
                 <!-- Section I: Tổng chỉ số -->
-                <table id="summaryTable">
+                <table id="summaryTable" class="data-table">
                     <thead>
                         <tr>
                             <td colspan="5"><h2>I. Tổng chỉ số</h2></td>
                         </tr>
                         <tr>
-                            <th>STT</th>
-                            <th>TÊN NV</th>
-                            <th>KH TIỀM NĂNG</th>
-                            <th>KÝ MỚI</th>
-                            <th>XHĐ</th>
+                            <th class="no-sort">STT</th>
+                            <th onclick="sortTable('summaryTable', 1, 'text')">TÊN NV</th>
+                            <th onclick="sortTable('summaryTable', 2, 'number')">KH TIỀM NĂNG</th>
+                            <th onclick="sortTable('summaryTable', 3, 'number')">KÝ MỚI</th>
+                            <th onclick="sortTable('summaryTable', 4, 'number')">XHĐ</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
 
                 <!-- Section II: Thống kê khách hàng theo khu vực -->
-                <table id="regionTable">
+                <table id="regionTable" class="data-table">
                     <thead>
                         <tr>
                             <td colspan="6"><h2>II. Thống kê khách hàng theo khu vực</h2></td>
                         </tr>
                         <tr>
-                            <th>STT</th>
-                            <th>TỈNH</th>
-                            <th>KH TIỀM NĂNG</th>
-                            <th>KÝ</th>
-                            <th>XUẤT</th>
-                            <th>TỈ LỆ KÝ MỚI</th>
+                            <th class="no-sort">STT</th>
+                            <th onclick="sortTable('regionTable', 1, 'text')">TỈNH</th>
+                            <th onclick="sortTable('regionTable', 2, 'number')">KH TIỀM NĂNG</th>
+                            <th onclick="sortTable('regionTable', 3, 'number')">KÝ</th>
+                            <th onclick="sortTable('regionTable', 4, 'number')">XUẤT</th>
+                            <th onclick="sortTable('regionTable', 5, 'number')">TỈ LỆ KÝ MỚI</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
 
                 <!-- Section III: Thống kê theo loại xe -->
-                <table id="vehicleTypeTable">
+                <table id="vehicleTypeTable" class="data-table">
                     <thead>
                         <tr>
                             <td colspan="6"><h2>III. Thống kê theo loại xe</h2></td>
                         </tr>
                         <tr>
-                            <th>STT</th>
-                            <th>LOẠI XE</th>
-                            <th>KH TIỀM NĂNG</th>
-                            <th>KÝ</th>
-                            <th>XUẤT</th>
-                            <th>TỈ LỆ KÝ MỚI</th>
+                            <th class="no-sort">STT</th>
+                            <th onclick="sortTable('vehicleTypeTable', 1, 'text')">LOẠI XE</th>
+                            <th onclick="sortTable('vehicleTypeTable', 2, 'number')">KH TIỀM NĂNG</th>
+                            <th onclick="sortTable('vehicleTypeTable', 3, 'number')">KÝ</th>
+                            <th onclick="sortTable('vehicleTypeTable', 4, 'number')">XUẤT</th>
+                            <th onclick="sortTable('vehicleTypeTable', 5, 'number')">TỈ LỆ KÝ MỚI</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -543,5 +572,91 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <script>
+        // Biến để theo dõi trạng thái sắp xếp của từng cột trong từng bảng
+        const sortStates = {
+            'summaryTable': {},
+            'regionTable': {},
+            'vehicleTypeTable': {}
+        };
+
+        // Hàm sắp xếp bảng
+        function sortTable(tableId, colIndex, type = 'number') {
+            const table = document.getElementById(tableId);
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+            // Tách hàng "Tổng" (nếu có) để không sắp xếp
+            let totalRow = null;
+            const nonTotalRows = rows.filter(row => {
+                if (row.classList.contains('total-row')) {
+                    totalRow = row;
+                    return false;
+                }
+                return true;
+            });
+
+            // Tạo danh sách các cặp [toggleRow, detailRow] (nếu có)
+            const rowPairs = [];
+            let i = 0;
+            while (i < nonTotalRows.length) {
+                const toggleRow = nonTotalRows[i];
+                let detailRow = null;
+                if (i + 1 < nonTotalRows.length && nonTotalRows[i + 1].classList.contains('detail-row')) {
+                    detailRow = nonTotalRows[i + 1];
+                    i += 2; // Bỏ qua detailRow
+                } else {
+                    i += 1;
+                }
+                rowPairs.push({ toggleRow, detailRow });
+            }
+
+            // Khởi tạo trạng thái sắp xếp nếu chưa có
+            if (!sortStates[tableId][colIndex]) {
+                sortStates[tableId][colIndex] = 'asc'; // Mặc định là tăng dần
+            } else {
+                // Đảo ngược trạng thái sắp xếp
+                sortStates[tableId][colIndex] = sortStates[tableId][colIndex] === 'asc' ? 'desc' : 'asc';
+            }
+
+            const direction = sortStates[tableId][colIndex] === 'asc' ? 1 : -1;
+
+            // Sắp xếp các cặp [toggleRow, detailRow] dựa trên toggleRow
+            rowPairs.sort((pairA, pairB) => {
+                let cellA = pairA.toggleRow.getElementsByTagName('td')[colIndex].innerText.trim();
+                let cellB = pairB.toggleRow.getElementsByTagName('td')[colIndex].innerText.trim();
+
+                if (type === 'text') {
+                    // Sắp xếp theo chữ (A → Z hoặc Z → A)
+                    return direction * cellA.localeCompare(cellB);
+                } else {
+                    // Sắp xếp theo số (lớn → nhỏ hoặc nhỏ → lớn)
+                    cellA = parseFloat(cellA) || 0;
+                    cellB = parseFloat(cellB) || 0;
+                    return direction * (cellA - cellB);
+                }
+            });
+
+            // Xóa các hàng cũ và thêm lại các hàng đã sắp xếp
+            while (tbody.firstChild) {
+                tbody.removeChild(tbody.firstChild);
+            }
+
+            // Thêm các cặp [toggleRow, detailRow] đã sắp xếp và cập nhật STT
+            rowPairs.forEach((pair, index) => {
+                // Cập nhật STT (cột đầu tiên) từ 1 trở đi
+                pair.toggleRow.getElementsByTagName('td')[0].innerText = index + 1;
+                tbody.appendChild(pair.toggleRow);
+                if (pair.detailRow) {
+                    tbody.appendChild(pair.detailRow);
+                }
+            });
+
+            // Thêm lại hàng "Tổng" (nếu có) vào cuối
+            if (totalRow) {
+                tbody.appendChild(totalRow);
+            }
+        }
+    </script>
 </body>
 </html>
