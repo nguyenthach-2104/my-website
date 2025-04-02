@@ -136,10 +136,11 @@
             border-radius: 8px;
             margin-bottom: 30px;
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Ngăn xuống hàng trên laptop */
             gap: 10px; /* Khoảng cách giữa các phần tử */
             align-items: center;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5);
+            overflow-x: auto; /* Cho phép cuộn ngang nếu cần */
         }
 
         .filter-bar label {
@@ -193,7 +194,9 @@
 
         h2 {
             font-size: 22px;
-            margin: 30px 0 15px;
+            margin: 0; /* Loại bỏ margin để h2 nằm gọn trong bảng */
+            padding: 15px; /* Thêm padding để tiêu đề trong bảng trông thoáng */
+            text-align: left;
         }
 
         h3 {
@@ -210,7 +213,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+            background: rgba(255, 255, 255, 0.6); /* Màu trắng, opacity 60% */
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 30px;
@@ -220,13 +223,13 @@
         th, td {
             padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(96, 96, 96, 0.2); /* Border xám nhạt */
         }
 
         th {
-            background-color: #db8f21;
-            color: white;
-            font-weight: 600;
+            background: none; /* Loại bỏ màu nền */
+            color: #606060; /* Màu xám */
+            font-weight: bold; /* In đậm */
             text-transform: uppercase;
             font-size: 14px;
         }
@@ -237,11 +240,11 @@
         }
 
         tr:hover:not(.total-row):not(.toggle-row) {
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.8); /* Hiệu ứng hover nhẹ */
         }
 
         .total-row {
-            background-color: #faeccf;
+            background: none; /* Loại bỏ màu nền */
             font-weight: bold;
             color: #606060;
         }
@@ -249,11 +252,11 @@
         .toggle-row {
             cursor: pointer;
             font-weight: 500;
-            background-color: rgba(255, 255, 255, 0.8);
+            background: none; /* Trong suốt */
         }
 
         .toggle-row:hover {
-            background-color: rgba(255, 255, 255, 1);
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
         .detail-row {
@@ -263,16 +266,17 @@
         .sub-table {
             width: 100%;
             margin: 10px 0;
-            background-color: transparent;
+            background: none; /* Trong suốt */
         }
 
         .sub-table th {
-            background-color: #eab42d;
-            color: white;
+            background: none; /* Loại bỏ màu nền */
+            color: #606060; /* Màu xám */
+            font-weight: bold;
         }
 
         .sub-table td {
-            background-color: rgba(255, 255, 255, 0.8);
+            background: none; /* Trong suốt */
         }
 
         /* Biểu đồ */
@@ -358,6 +362,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 padding: 10px; /* Giảm padding để tăng chiều rộng nội dung */
+                flex-wrap: wrap; /* Đảm bảo xuống hàng trên mobile */
             }
 
             .filter-bar input,
@@ -456,9 +461,11 @@
                 </div>
 
                 <!-- Section I: Tổng chỉ số -->
-                <h2>I. Tổng chỉ số</h2>
                 <table id="summaryTable">
                     <thead>
+                        <tr>
+                            <td colspan="5"><h2>I. Tổng chỉ số</h2></td>
+                        </tr>
                         <tr>
                             <th>STT</th>
                             <th>TÊN NV</th>
@@ -471,9 +478,11 @@
                 </table>
 
                 <!-- Section II: Thống kê khách hàng theo khu vực -->
-                <h2>II. Thống kê khách hàng theo khu vực</h2>
                 <table id="regionTable">
                     <thead>
+                        <tr>
+                            <td colspan="6"><h2>II. Thống kê khách hàng theo khu vực</h2></td>
+                        </tr>
                         <tr>
                             <th>STT</th>
                             <th>TỈNH</th>
@@ -487,9 +496,11 @@
                 </table>
 
                 <!-- Section III: Thống kê theo loại xe -->
-                <h2>III. Thống kê theo loại xe</h2>
                 <table id="vehicleTypeTable">
                     <thead>
+                        <tr>
+                            <td colspan="6"><h2>III. Thống kê theo loại xe</h2></td>
+                        </tr>
                         <tr>
                             <th>STT</th>
                             <th>LOẠI XE</th>
